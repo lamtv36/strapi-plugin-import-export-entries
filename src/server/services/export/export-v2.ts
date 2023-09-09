@@ -1,22 +1,11 @@
-import {
-  Attribute,
-  ComponentAttribute,
-  ComponentEntry,
-  DynamicZoneAttribute,
-  DynamicZoneEntry,
-  Entry,
-  EntryId,
-  MediaAttribute,
-  RelationAttribute,
-  Schema,
-  SchemaUID,
-} from '../../types';
+import { Attribute, ComponentAttribute, ComponentEntry, DynamicZoneAttribute, DynamicZoneEntry, Entry, EntryId, MediaAttribute, RelationAttribute, Schema } from '../../types';
 import cloneDeep from 'lodash/cloneDeep';
 import fromPairs from 'lodash/fromPairs';
 import { isEmpty, merge } from 'lodash/fp';
 import qs from 'qs';
 import { isArraySafe, toArray } from '../../../libs/arrays';
 import { CustomSlugToSlug, CustomSlugs } from '../../config/constants';
+import { SchemaUID } from '@strapi/strapi/lib/types/utils';
 import { ObjectBuilder, isObjectSafe, mergeObjects } from '../../../libs/objects';
 import { EnumValues } from '../../../types';
 import {
@@ -119,8 +108,8 @@ async function findEntriesForHierarchy(
 
         for (const entry of entries) {
           (entry.localizations || []).forEach((localization) => {
-            if (localization.id && !entryIdsToExported[localization.id]) {
-              allEntries.push(localization as any);
+            if (!entryIdsToExported[localization.id]) {
+              allEntries.push(localization);
               entryIdsToExported[localization.id] = true;
             }
           });

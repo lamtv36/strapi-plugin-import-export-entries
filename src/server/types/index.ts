@@ -1,64 +1,72 @@
-import { Attribute as StrapiAttribute, Schema as StrapiSchema } from '@strapi/strapi';
+import {
+  CollectionTypeSchema as StrapiCollectionTypeSchema,
+  ComponentSchema as StrapiComponentSchema,
+  SingleTypeSchema as StrapiSingleTypeSchema,
+  ComponentAttribute as StrapiComponentAttribute,
+  ComponentValue as StrapiComponentValue,
+  DynamicZoneAttribute as StrapiDynamicZoneAttribute,
+  DynamicZoneValue as StrapiDynamicZoneValue,
+  MediaAttribute as StrapiMediaAttribute,
+  MediaValue as StrapiMediaValue,
+  RelationAttribute as StrapiRelationAttribute,
+  RelationValue as StrapiRelationValue,
+} from '@strapi/strapi';
+import { SchemaUID } from '@strapi/strapi/lib/types/utils';
 
 export type {
   Attribute,
-  AttributeType,
-  CollectionTypeSchema,
   ComponentAttribute,
-  ComponentEntry,
-  ComponentSchema,
   DynamicZoneAttribute,
-  DynamicZoneEntry,
+  MediaAttribute,
+  RelationAttribute,
   Entry,
   EntryId,
-  MediaAttribute,
+  ComponentEntry,
+  DynamicZoneEntry,
   MediaEntry,
-  RelationAttribute,
   RelationEntry,
   Schema,
-  SchemaUID,
+  CollectionTypeSchema,
   SingleTypeSchema,
+  ComponentSchema,
   User,
 };
 
-type SchemaUID = 'plugin::upload.file' | string;
-
 type User = any;
 
-type AttributeType = StrapiAttribute.Kind;
 type BaseAttribute = { name: string };
 type Attribute = ComponentAttribute | DynamicZoneAttribute | MediaAttribute | RelationAttribute;
-type ComponentAttribute = BaseAttribute & (StrapiAttribute.Component<any, true> | StrapiAttribute.Component<any, false>);
-type DynamicZoneAttribute = BaseAttribute & StrapiAttribute.DynamicZone;
-type MediaAttribute = BaseAttribute & StrapiAttribute.Media<'audios' | 'files' | 'images' | 'videos'>;
+type ComponentAttribute = BaseAttribute & (StrapiComponentAttribute<'own-component', true> | StrapiComponentAttribute<'own-component', false>);
+type DynamicZoneAttribute = BaseAttribute & StrapiDynamicZoneAttribute<['own-component']>;
+type MediaAttribute = BaseAttribute & StrapiMediaAttribute<'audios' | 'files' | 'images' | 'videos'>;
 type RelationAttribute = BaseAttribute &
   (
-    | StrapiAttribute.Relation<any, 'oneToOne'>
-    | StrapiAttribute.Relation<any, 'oneToMany'>
-    | StrapiAttribute.Relation<any, 'manyToOne'>
-    | StrapiAttribute.Relation<any, 'manyToMany'>
+    | StrapiRelationAttribute<'own-collection-type' | 'own-single-type', 'oneToOne'>
+    | StrapiRelationAttribute<'own-collection-type' | 'own-single-type', 'oneToMany'>
+    | StrapiRelationAttribute<'own-collection-type' | 'own-single-type', 'manyToOne'>
+    | StrapiRelationAttribute<'own-collection-type' | 'own-single-type', 'manyToMany'>
   );
 // TODO: handle polymorphic relations
-// | StrapiAttribute.Relation<any, 'morphOne'>
-// | StrapiAttribute.Relation<any, 'morphMany'>
-// | StrapiAttribute.Relation<any, 'morphToOne'>
-// | StrapiAttribute.Relation<any, 'morphToMany'>
+// | StrapiRelationAttribute<'own-collection-type' | 'own-single-type', 'morphOne'>
+// | StrapiRelationAttribute<'own-collection-type' | 'own-single-type', 'morphMany'>
+// | StrapiRelationAttribute<'own-collection-type' | 'own-single-type', 'morphToOne'>
+// | StrapiRelationAttribute<'own-collection-type' | 'own-single-type', 'morphToMany'>
 
 // Media are not included in type because equals any atm.
 type Entry = ComponentEntry | DynamicZoneEntry | RelationEntry;
-type ComponentEntry = (WithI18n<StrapiAttribute.ComponentValue<any, true>> & EntryBase) | (WithI18n<StrapiAttribute.ComponentValue<any, false>> & EntryBase);
-type DynamicZoneEntry = WithI18n<UnwrapArray<StrapiAttribute.DynamicZoneValue<[any]>>> & EntryBase;
-type MediaEntry = StrapiAttribute.MediaValue;
+type ComponentEntry = (WithI18n<StrapiComponentValue<'own-component', true>> & EntryBase) | (WithI18n<StrapiComponentValue<'own-component', false>> & EntryBase);
+type DynamicZoneEntry = WithI18n<UnwrapArray<StrapiDynamicZoneValue<['own-component']>>> & EntryBase;
+type MediaEntry = StrapiMediaValue;
 type RelationEntry =
-  | (WithI18n<StrapiAttribute.RelationValue<'oneToOne', any>> & EntryBase)
-  | (WithI18n<StrapiAttribute.RelationValue<'oneToMany', any>> & EntryBase)
-  | (WithI18n<StrapiAttribute.RelationValue<'manyToOne', any>> & EntryBase)
-  | (WithI18n<StrapiAttribute.RelationValue<'manyToMany', any>> & EntryBase);
+  | (WithI18n<StrapiRelationValue<'oneToOne', 'own-collection-type' | 'own-single-type'>> & EntryBase)
+  | (WithI18n<StrapiRelationValue<'oneToMany', 'own-collection-type' | 'own-single-type'>> & EntryBase)
+  | (WithI18n<StrapiRelationValue<'manyToOne', 'own-collection-type' | 'own-single-type'>> & EntryBase)
+  | (WithI18n<StrapiRelationValue<'manyToMany', 'own-collection-type' | 'own-single-type'>> & EntryBase);
 // TODO: handle polymorphic relations
-// | (WithI18n<StrapiAttribute.RelationValue<'morphOne', any>> & EntryBase)
-// | (WithI18n<StrapiAttribute.RelationValue<'morphMany', any>> & EntryBase)
-// | (WithI18n<StrapiAttribute.RelationValue<'morphToOne', any>> & EntryBase)
-// | (WithI18n<StrapiAttribute.RelationValue<'morphToMany', any>> & EntryBase);
+// | (WithI18n<StrapiRelationValue<'morphOne', 'own-collection-type' | 'own-single-type'>> & EntryBase)
+// | (WithI18n<StrapiRelationValue<'morphMany', 'own-collection-type' | 'own-single-type'>> & EntryBase)
+// | (WithI18n<StrapiRelationValue<'morphToOne', 'own-collection-type' | 'own-single-type'>> & EntryBase)
+// | (WithI18n<StrapiRelationValue<'morphToMany', 'own-collection-type' | 'own-single-type'>> & EntryBase);
 type EntryBase = { id: EntryId };
 type EntryId = number | string;
 type WithI18n<T> = UnwrapArray<T> & {
@@ -68,9 +76,9 @@ type WithI18n<T> = UnwrapArray<T> & {
 type UnwrapArray<T> = T extends Array<infer U> ? U : T;
 
 type Schema = CollectionTypeSchema | SingleTypeSchema | ComponentSchema;
-type CollectionTypeSchema = StrapiSchema.CollectionType & SchemaPluginOptions;
-type SingleTypeSchema = StrapiSchema.SingleType & SchemaPluginOptions;
-type ComponentSchema = StrapiSchema.Component & { uid: SchemaUID } & SchemaPluginOptions;
+type CollectionTypeSchema = StrapiCollectionTypeSchema & SchemaPluginOptions;
+type SingleTypeSchema = StrapiSingleTypeSchema & SchemaPluginOptions;
+type ComponentSchema = StrapiComponentSchema & { uid: SchemaUID } & SchemaPluginOptions;
 type SchemaPluginOptions = {
   pluginOptions?: {
     'content-manager'?: {

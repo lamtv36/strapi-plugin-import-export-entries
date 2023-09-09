@@ -1,4 +1,4 @@
-import { SchemaUID } from '../../../types';
+import { SchemaUID } from '@strapi/strapi/lib/types/utils';
 
 export { FileEntry, FileId, FileEntryDynamicZone };
 
